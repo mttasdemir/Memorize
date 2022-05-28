@@ -8,13 +8,18 @@
 import SwiftUI
 
 struct ContentView: View {
-    let emojis = ["😜", "🤪", "😩", "🤫", "🚗", "🚌", "🚎", "🏎", "🚓", "🚑", "🚒", "🛻", "🚚", "🚛", "🚜", "🛵", "🏍", "🛺", "🚔", "🚠", "✈️", "🚁", "🛳", "⛵️", "🛸"]
-    @State private var emojiCount = 20
+    static let vehicles = ["🚗", "🚌", "🚎", "🏎", "🚓", "🚑", "🚒", "🛻", "🚚", "🚛", "🚜", "🛵", "🏍", "🛺", "🚔", "🚠", "✈️", "🚁", "🛳", "⛵️", "🛸"]
+    static let animals = ["🐶", "🦊", "🦁", "🙊", "🐣", "🦉", "🦄", "🦋", "🐞", "🐢", "🐬", "🐄", "🦜", "🐏"]
+    static let foods = ["🍏", "🍊", "🍓", "🍋", "🍉", "🍒", "🥑", "🍍", "🍇", "🥂"]
+        
+    @State var emojis = vehicles
+    
     var body: some View {
         VStack {
+            title
             ScrollView(showsIndicators: false) {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
-                    ForEach(emojis[0..<emojiCount], id: \.self) { emoji in
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: widthThatBestFits(cardCount: emojis.count)))]) {
+                    ForEach(emojis, id: \.self) { emoji in
                         CardView(content: emoji)
                             .aspectRatio(2/3, contentMode: .fit)
                     }
@@ -22,30 +27,55 @@ struct ContentView: View {
                 .foregroundColor(/*@START_MENU_TOKEN@*/.red/*@END_MENU_TOKEN@*/)
             }
             Spacer()
-            HStack {
-                remove
-                Spacer()
-                add
-            }
-            .padding(.horizontal)
+            themeToolbar
         }
         .padding()
     }
     
-    var remove: some View {
-        Button {
-            if emojiCount > 0 {
-                emojiCount -= 1
-            }
-        } label: { Image(systemName: "minus.circle").font(.largeTitle) }
+    var title: some View {
+        Text("Memorize!")
+            .font(.largeTitle).fontWeight(.semibold)
+            .padding(.bottom)
     }
     
-    var add: some View {
-        Button {
-            if emojiCount < emojis.count {
-                emojiCount += 1
+    var themeToolbar: some View {
+        HStack(alignment: .center) {
+            Button {
+                let emojiCount = Int.random(in: 3..<ContentView.vehicles.count)
+                emojis = Array(ContentView.vehicles.shuffled()[0...emojiCount])
+            } label: {
+                VStack {
+                    Image(systemName: "car.fill")
+                    Text("Vehicle").font(.title3)
+                }
             }
-        } label: { Image(systemName: "plus.circle").font(.largeTitle) }
+            Spacer()
+            Button {
+                let emojiCount = Int.random(in: 3..<ContentView.animals.count)
+                emojis = Array(ContentView.animals.shuffled()[0...emojiCount])
+            } label: {
+                VStack {
+                    Image(systemName: "pawprint.fill")
+                    Text("Animals").font(.title3)
+                }
+            }
+            Spacer()
+            Button {
+                let emojiCount = Int.random(in: 3..<ContentView.foods.count)
+                emojis = Array(ContentView.foods.shuffled()[0...emojiCount])
+            } label: {
+                VStack {
+                    Image(systemName: "heart.fill")
+                    Text("Health").font(.title3)
+                }
+            }
+        }
+        .font(.largeTitle)
+        .padding(.horizontal)
+    }
+    
+    private func widthThatBestFits(cardCount: Int) -> CGFloat {
+        CGFloat(16 * 65 / cardCount)
     }
 }
 
@@ -55,7 +85,7 @@ struct CardView: View {
     @State private var isFaceup: Bool = true
     var body: some View {
         ZStack {
-            let shape = RoundedRectangle(cornerRadius: 25)
+            let shape = RoundedRectangle(cornerRadius: 15)
             if isFaceup {
                 shape.foregroundColor(.white)
                 shape.strokeBorder(lineWidth: 3)
@@ -77,6 +107,7 @@ struct ContentView_Preview: PreviewProvider {
         ContentView()
             .preferredColorScheme(.dark)
         ContentView()
+            .previewDevice("iPad (9th generation)")
             .preferredColorScheme(.light)
     }
 }
