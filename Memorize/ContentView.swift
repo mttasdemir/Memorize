@@ -8,26 +8,23 @@
 import SwiftUI
 
 struct ContentView: View {
-    static let vehicles = ["🚗", "🚌", "🚎", "🏎", "🚓", "🚑", "🚒", "🛻", "🚚", "🚛", "🚜", "🛵", "🏍", "🛺", "🚔", "🚠", "✈️", "🚁", "🛳", "⛵️", "🛸"]
-    static let animals = ["🐶", "🦊", "🦁", "🙊", "🐣", "🦉", "🦄", "🦋", "🐞", "🐢", "🐬", "🐄", "🦜", "🐏"]
-    static let foods = ["🍏", "🍊", "🍓", "🍋", "🍉", "🍒", "🥑", "🍍", "🍇", "🥂"]
-        
-    @State var emojis = vehicles
+    @ObservedObject var viewModel: EmojiMemoryGame
     
     var body: some View {
         VStack {
             title
             ScrollView(showsIndicators: false) {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: widthThatBestFits(cardCount: emojis.count)))]) {
-                    ForEach(emojis, id: \.self) { emoji in
-                        CardView(content: emoji)
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: widthThatBestFits(cardCount: viewModel.cards.count)))]) {
+                    ForEach(viewModel.cards) { card in
+                        CardView(card)
                             .aspectRatio(2/3, contentMode: .fit)
+                            .onTapGesture {
+                                viewModel.choose(card)
+                            }
                     }
                 }
                 .foregroundColor(/*@START_MENU_TOKEN@*/.red/*@END_MENU_TOKEN@*/)
             }
-            Spacer()
-            themeToolbar
         }
         .padding()
     }
@@ -38,64 +35,30 @@ struct ContentView: View {
             .padding(.bottom)
     }
     
-    var themeToolbar: some View {
-        HStack(alignment: .center) {
-            Button {
-                let emojiCount = Int.random(in: 3..<ContentView.vehicles.count)
-                emojis = Array(ContentView.vehicles.shuffled()[0...emojiCount])
-            } label: {
-                VStack {
-                    Image(systemName: "car.fill")
-                    Text("Vehicle").font(.title3)
-                }
-            }
-            Spacer()
-            Button {
-                let emojiCount = Int.random(in: 3..<ContentView.animals.count)
-                emojis = Array(ContentView.animals.shuffled()[0...emojiCount])
-            } label: {
-                VStack {
-                    Image(systemName: "pawprint.fill")
-                    Text("Animals").font(.title3)
-                }
-            }
-            Spacer()
-            Button {
-                let emojiCount = Int.random(in: 3..<ContentView.foods.count)
-                emojis = Array(ContentView.foods.shuffled()[0...emojiCount])
-            } label: {
-                VStack {
-                    Image(systemName: "heart.fill")
-                    Text("Health").font(.title3)
-                }
-            }
-        }
-        .font(.largeTitle)
-        .padding(.horizontal)
+    private func widthThatBestFits(cardCount: Int) -> CGFloat {
+        CGFloat(16 * 40 / cardCount)
     }
     
-    private func widthThatBestFits(cardCount: Int) -> CGFloat {
-        CGFloat(16 * 65 / cardCount)
-    }
 }
 
 
 struct CardView: View {
-    let content: String
-    @State private var isFaceup: Bool = true
+    let card: MemoryGame<String>.Card
+    
+    init(_ card: MemoryGame<String>.Card) {
+        self.card = card
+    }
+    
     var body: some View {
         ZStack {
             let shape = RoundedRectangle(cornerRadius: 15)
-            if isFaceup {
+            if card.isFaceUp {
                 shape.foregroundColor(.white)
                 shape.strokeBorder(lineWidth: 3)
-                Text(content).font(.largeTitle)
+                Text(card.content).font(.largeTitle)
             } else {
                 shape
             }
-        }
-        .onTapGesture {
-            isFaceup.toggle()
         }
     }
     
@@ -104,9 +67,10 @@ struct CardView: View {
 
 struct ContentView_Preview: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        let game = EmojiMemoryGame()
+        ContentView(viewModel: game)
             .preferredColorScheme(.dark)
-        ContentView()
+        ContentView(viewModel: game)
             .previewDevice("iPad (9th generation)")
             .preferredColorScheme(.light)
     }
