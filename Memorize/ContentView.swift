@@ -57,7 +57,7 @@ struct CardView: View {
                 shape.strokeBorder(lineWidth: 3)
                 Text(card.content).font(.largeTitle)
             } else {
-                shape
+                shape.opacity(card.isMatched ? 0 : 1)
             }
         }
     }
