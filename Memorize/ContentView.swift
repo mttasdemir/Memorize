@@ -23,20 +23,34 @@ struct ContentView: View {
                             }
                     }
                 }
-                .foregroundColor(/*@START_MENU_TOKEN@*/.red/*@END_MENU_TOKEN@*/)
+                .foregroundColor(viewModel.themeColor)
             }
+            Spacer()
+            newGame
         }
         .padding()
     }
     
     var title: some View {
-        Text("Memorize!")
-            .font(.largeTitle).fontWeight(.semibold)
-            .padding(.bottom)
+        HStack {
+            Text(viewModel.themeName)
+                .font(.largeTitle).fontWeight(.semibold)
+            Spacer()
+            Text("Score: \(viewModel.score)")
+                .font(.title3)
+        }
+        .padding([.bottom, .leading, .trailing])
+    }
+    
+    var newGame: some View {
+        Button("New Game") {
+            viewModel.newGame()
+        }
     }
     
     private func widthThatBestFits(cardCount: Int) -> CGFloat {
-        CGFloat(16 * 40 / cardCount)
+        //CGFloat(16 * 65 / cardCount)
+        return 65
     }
     
 }
