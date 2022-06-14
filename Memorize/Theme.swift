@@ -15,13 +15,13 @@ struct Theme {
 
     
     let name: ThemeType
-    let color: Color
+    let gradient: Gradient
     let numberOfPairsOfCard: Int
     var emojis: Array<String>
     
-    init(name: Theme.ThemeType, color: Theme.Color, numberOfPairsOfCard: Int) {
+    init(name: Theme.ThemeType, gradient: Gradient, numberOfPairsOfCard: Int) {
         self.name = name
-        self.color = color
+        self.gradient = gradient
         switch name {
         case .vehicle:
             emojis = Theme.vehicles
@@ -41,7 +41,7 @@ struct Theme {
     }
     
     enum Color: CaseIterable {
-        case red, yellow, green, blue
+        case red, yellow, green, blue, orange, purple
         
         static func random() -> Color {
             Color.allCases.randomElement() ?? .yellow
@@ -53,6 +53,17 @@ struct Theme {
         
         static func random() -> ThemeType {
             ThemeType.allCases.randomElement() ?? .vehicle
+        }
+    }
+    
+    struct Gradient {
+        var colors: Array<Color>
+        
+        init(_ colors: Color...) {
+            self.colors = []
+            for color in colors {
+                self.colors.append(color)
+            }
         }
     }
     

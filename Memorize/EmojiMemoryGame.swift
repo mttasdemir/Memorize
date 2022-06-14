@@ -19,17 +19,23 @@ class EmojiMemoryGame: ObservableObject {
     private var theme: Theme
     
     init() {
-        self.theme = Theme(name: .random(), color: .random(), numberOfPairsOfCard: Int.random(in: numberOfEmojiInRange))
+        self.theme = Theme(name: .random(), gradient: Theme.Gradient(.random(), .random(), .random()), numberOfPairsOfCard: Int.random(in: numberOfEmojiInRange))
         self.model = MemoryGame(numberOfPairsOfCards: theme.numberOfPairsOfCard, createCardContent: theme.dealACard)
     }
     
-    var themeColor: Color {
-        switch theme.color {
-        case .red: return .red
-        case .yellow: return .yellow
-        case .green: return .green
-        case .blue: return .blue
+    var themeGradient: [Color] {
+        var result = [Color]()
+        for color in theme.gradient.colors {
+            switch color {
+            case .red: result.append(.red)
+            case .yellow: result.append(.yellow)
+            case .green: result.append(.green)
+            case .blue: result.append(.blue)
+            case .orange: result.append(.orange)
+            case .purple: result.append(.purple)
+            }
         }
+        return result
     }
     
     var themeName: String {
@@ -46,7 +52,7 @@ class EmojiMemoryGame: ObservableObject {
     }
     
     func newGame() {
-        self.theme = Theme(name: .random(), color: .random(), numberOfPairsOfCard: Int.random(in: numberOfEmojiInRange))
+        self.theme = Theme(name: .random(), gradient: Theme.Gradient(.random(), .random()), numberOfPairsOfCard: Int.random(in: numberOfEmojiInRange))
         self.model = MemoryGame(numberOfPairsOfCards: theme.numberOfPairsOfCard, createCardContent: theme.dealACard)
     }
 }
