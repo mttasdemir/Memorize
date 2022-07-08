@@ -43,9 +43,9 @@ struct ContentView: View {
 
 
 struct CardView: View {
-    let card: MemoryGame<String>.Card
+    private let card: EmojiMemoryGame.Card
     
-    init(_ card: MemoryGame<String>.Card) {
+    init(_ card: EmojiMemoryGame.Card) {
         self.card = card
     }
     
