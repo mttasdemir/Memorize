@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  EmojiMemoryGameView.swift
 //  Memorize
 //
 //  Created by Mustafa Taşdemir on 23.05.2022.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct EmojiMemoryGameView: View {
     @ObservedObject var viewModel: EmojiMemoryGame
     
     var body: some View {
@@ -16,7 +16,7 @@ struct ContentView: View {
             ScrollView(showsIndicators: false) {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: widthThatBestFits(cardCount: viewModel.cards.count)))]) {
                     ForEach(viewModel.cards) { card in
-                        CardView(card)
+                        CardView(card: card)
                             .aspectRatio(2/3, contentMode: .fit)
                             .onTapGesture {
                                 viewModel.choose(card)
@@ -36,30 +36,38 @@ struct ContentView: View {
     }
     
     private func widthThatBestFits(cardCount: Int) -> CGFloat {
-        CGFloat(16 * 40 / cardCount)
+        CGFloat(16 * 90 / cardCount)
     }
     
 }
 
 
 struct CardView: View {
-    private let card: EmojiMemoryGame.Card
-    
-    init(_ card: EmojiMemoryGame.Card) {
-        self.card = card
-    }
+    let card: EmojiMemoryGame.Card
     
     var body: some View {
-        ZStack {
-            let shape = RoundedRectangle(cornerRadius: 15)
-            if card.isFaceUp {
-                shape.foregroundColor(.white)
-                shape.strokeBorder(lineWidth: 3)
-                Text(card.content).font(.largeTitle)
-            } else {
-                shape.opacity(card.isMatched ? 0 : 1)
+        GeometryReader{ geometryProxy in
+            ZStack {
+                let shape = RoundedRectangle(cornerRadius: DrawingConstants.cornerRadius)
+                if card.isFaceUp {
+                    shape.foregroundColor(.white)
+                    shape.strokeBorder(lineWidth: DrawingConstants.lineWidth)
+                    Text(card.content).font(font(in: geometryProxy.size))
+                } else {
+                    shape.opacity(card.isMatched ? 0 : 1)
+                }
             }
         }
+    }
+    
+    private func font(in size: CGSize) -> Font {
+        Font.system(size: min(size.width, size.height) * DrawingConstants.fontScalingFactor)
+    }
+
+    struct DrawingConstants {
+        static let cornerRadius: CGFloat = 15
+        static let lineWidth: CGFloat = 3
+        static let fontScalingFactor: CGFloat = 0.8
     }
     
 }
@@ -68,9 +76,9 @@ struct CardView: View {
 struct ContentView_Preview: PreviewProvider {
     static var previews: some View {
         let game = EmojiMemoryGame()
-        ContentView(viewModel: game)
+        EmojiMemoryGameView(viewModel: game)
             .preferredColorScheme(.dark)
-        ContentView(viewModel: game)
+        EmojiMemoryGameView(viewModel: game)
             .previewDevice("iPad (9th generation)")
             .preferredColorScheme(.light)
     }
