@@ -13,17 +13,17 @@ struct EmojiMemoryGameView: View {
     var body: some View {
         VStack {
             title
-            ScrollView(showsIndicators: false) {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: widthThatBestFits(cardCount: viewModel.cards.count)))]) {
-                    ForEach(viewModel.cards) { card in
-                        CardView(card: card)
-                            .aspectRatio(2/3, contentMode: .fit)
-                            .onTapGesture {
-                                viewModel.choose(card)
-                            }
-                    }
+            AspectVGrid(items: viewModel.cards, aspectRatio: 2/3) { card in
+                if card.isMatched && !card.isFaceUp {
+                    Rectangle().opacity(0)
+                } else {
+                    CardView(card: card)
+                        .aspectRatio(2/3, contentMode: .fit)
+                        .padding([.all], 3)
+                        .onTapGesture {
+                            viewModel.choose(card)
+                        }
                 }
-                .foregroundColor(/*@START_MENU_TOKEN@*/.red/*@END_MENU_TOKEN@*/)
             }
         }
         .padding()
@@ -33,10 +33,6 @@ struct EmojiMemoryGameView: View {
         Text("Memorize!")
             .font(.largeTitle).fontWeight(.semibold)
             .padding(.bottom)
-    }
-    
-    private func widthThatBestFits(cardCount: Int) -> CGFloat {
-        CGFloat(16 * 90 / cardCount)
     }
     
 }
@@ -54,7 +50,7 @@ struct CardView: View {
                     shape.strokeBorder(lineWidth: DrawingConstants.lineWidth)
                     Text(card.content).font(font(in: geometryProxy.size))
                 } else {
-                    shape.opacity(card.isMatched ? 0 : 1)
+                    shape.foregroundColor(.red).opacity(card.isMatched ? 0 : 1)
                 }
             }
         }
@@ -65,9 +61,9 @@ struct CardView: View {
     }
 
     struct DrawingConstants {
-        static let cornerRadius: CGFloat = 15
+        static let cornerRadius: CGFloat = 10
         static let lineWidth: CGFloat = 3
-        static let fontScalingFactor: CGFloat = 0.8
+        static let fontScalingFactor: CGFloat = 0.75
     }
     
 }
@@ -78,9 +74,9 @@ struct ContentView_Preview: PreviewProvider {
         let game = EmojiMemoryGame()
         EmojiMemoryGameView(viewModel: game)
             .preferredColorScheme(.dark)
-        EmojiMemoryGameView(viewModel: game)
-            .previewDevice("iPad (9th generation)")
-            .preferredColorScheme(.light)
+//        EmojiMemoryGameView(viewModel: game)
+//            .previewDevice("iPad (9th generation)")
+//            .preferredColorScheme(.light)
     }
 }
 
