@@ -11,13 +11,13 @@ struct AspectVGrid<Item, ItemView>: View where ItemView: View, Item: Identifiabl
     let items: [Item]
     let aspectRatio: CGFloat
     @ViewBuilder var content: (Item) -> ItemView
-    
+
     var body: some View {
         GeometryReader { geometryproxy in
             let width: CGFloat = widthThatFits(itemsCount: items.count, aspectRatio: aspectRatio, in: geometryproxy.size)
             LazyVGrid(columns: [gridItem(minWidth: width)], spacing: 0) {
                 ForEach(items) { item in
-                    content(item)
+                    content(item).aspectRatio(aspectRatio, contentMode: .fit)
                 }
             }
         }

@@ -18,13 +18,13 @@ struct EmojiMemoryGameView: View {
                     Rectangle().opacity(0)
                 } else {
                     CardView(card: card)
-                        .aspectRatio(2/3, contentMode: .fit)
                         .padding([.all], 3)
                         .onTapGesture {
                             viewModel.choose(card)
                         }
                 }
             }
+            .foregroundColor(.red)
         }
         .padding()
     }
@@ -44,15 +44,13 @@ struct CardView: View {
     var body: some View {
         GeometryReader{ geometryProxy in
             ZStack {
-                let shape = RoundedRectangle(cornerRadius: DrawingConstants.cornerRadius)
-                if card.isFaceUp {
-                    shape.foregroundColor(.white)
-                    shape.strokeBorder(lineWidth: DrawingConstants.lineWidth)
-                    Text(card.content).font(font(in: geometryProxy.size))
-                } else {
-                    shape.foregroundColor(.red).opacity(card.isMatched ? 0 : 1)
-                }
+                Text(card.content)
+                    .rotationEffect(Angle(degrees: card.isMatched ? 360 : 0))
+                    .animation(Animation.linear(duration: 1.0).repeatForever(autoreverses: false), value: card.isMatched)
+                    .font(font(in: geometryProxy.size))
+                Pie().opacity(0.4)
             }
+            .cardify(isFaceUp: card.isFaceUp)
         }
     }
     
@@ -61,9 +59,7 @@ struct CardView: View {
     }
 
     struct DrawingConstants {
-        static let cornerRadius: CGFloat = 10
-        static let lineWidth: CGFloat = 3
-        static let fontScalingFactor: CGFloat = 0.75
+        static let fontScalingFactor: CGFloat = 0.65
     }
     
 }
