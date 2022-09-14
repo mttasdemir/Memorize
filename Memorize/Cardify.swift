@@ -7,18 +7,38 @@
 
 import SwiftUI
 
-struct Cardify: ViewModifier {
-    let isFaceUp: Bool
-    func body(content: Content) -> some View {
-        let shape = RoundedRectangle(cornerRadius: DrawingConstants.cornerRadius)
-        if isFaceUp {
-            shape.foregroundColor(.white)
-            shape.strokeBorder(lineWidth: DrawingConstants.lineWidth)
-            
-        } else {
-            shape
+struct Cardify: ViewModifier, Animatable {
+    var animatableData: Double {
+        get {
+            angle
         }
-        content.opacity(isFaceUp ? 1 : 0)
+        set {
+            angle = newValue
+        }
+    }
+    var angle: Double
+    var isFaceUp: Bool
+    
+    init(isFaceUp: Bool) {
+        self.isFaceUp = isFaceUp
+        self.angle = isFaceUp ? 0: 180
+    }
+    
+    func body(content: Content) -> some View {
+        ZStack {
+            let shape = RoundedRectangle(cornerRadius: DrawingConstants.cornerRadius)
+            if angle < 90 {
+                shape.foregroundColor(.white)
+                shape.strokeBorder(lineWidth: DrawingConstants.lineWidth)
+                
+            } else {
+                ZStack {
+                    shape
+                    shape.stroke().foregroundColor(.black)
+                }
+            }
+            content.opacity(angle < 90 ? 1 : 0)
+        }
     }
     
     struct DrawingConstants {
