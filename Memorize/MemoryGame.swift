@@ -49,11 +49,49 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
     
     // MARK: - struct Card
     struct Card: Identifiable {
-        var isFaceUp = false
-        var isMatched = false
+        var isFaceUp = false {
+            willSet {
+                newValue ? startTimer() : stopTimer()
+            }
+        }
+        var isMatched = false {
+            willSet {
+                if newValue {
+                    stopTimer()
+                }
+            }
+        }
         let content: CardContent
         let id: Int
         var pie = Pie()
+        
+        let bonusLimit: Double = 10
+        var bonusTime: Double = 10
+        var startTime: TimeInterval = 0
+        var stopTime: TimeInterval = 0
+        var timerStarted: Bool = false
+
+        mutating func startTimer() {
+            timerStarted.toggle()
+            startTime = Date.now.timeIntervalSince1970
+        }
+        
+        mutating func stopTimer() {
+            if timerStarted {
+                timerStarted.toggle()
+                stopTime = Date.now.timeIntervalSince1970
+                bonusTime = max(0, bonusTime - (stopTime - startTime))
+            }
+        }
+        
+        var isConsuming: Bool {
+            isFaceUp && !isMatched && bonusTime > 0
+        }
+        
+        var bonusRemainingTimeRatio: Double {
+            bonusTime / bonusLimit
+        }
+        
     }
 }
 

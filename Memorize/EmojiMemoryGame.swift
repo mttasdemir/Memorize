@@ -24,7 +24,7 @@ class EmojiMemoryGame: ObservableObject {
         }
     }
     
-    @Published private var model = createMemoryGame(ofCardPairs: 4)
+    @Published private var model = createMemoryGame(ofCardPairs: Constants.numberOfPairsOfCard)
     
     var cards: Array<Card> {
         model.cards
@@ -40,7 +40,7 @@ class EmojiMemoryGame: ObservableObject {
     }
     
     func restart() {
-        model = EmojiMemoryGame.createMemoryGame(ofCardPairs: 4);
+        model = EmojiMemoryGame.createMemoryGame(ofCardPairs: Constants.numberOfPairsOfCard);
     }
         
     private var timer: Timer.TimerPublisher
@@ -75,6 +75,7 @@ class EmojiMemoryGame: ObservableObject {
     struct Constants {
         static let timeInterval = 0.01
         static let angleOfPie = (360 / 5) * timeInterval
+        static let numberOfPairsOfCard = 10
     }
     
 }

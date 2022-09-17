@@ -109,6 +109,7 @@ struct EmojiMemoryGameView: View {
 
 struct CardView: View {
     let card: EmojiMemoryGame.Card
+    @State private var animatedBonusRemainingTime: Double = 0
     var body: some View {
         GeometryReader{ geometryProxy in
             ZStack {
@@ -116,10 +117,23 @@ struct CardView: View {
                     .rotationEffect(Angle(degrees: card.isMatched ? 360 : 0))
                     .animation(Animation.linear(duration: 1.0).repeatForever(autoreverses: false), value: card.isMatched)
                     .font(font(in: geometryProxy.size))
-                card.pie.opacity(0.4)
+                Group {
+                    if card.isConsuming {
+                        Pie(startAngle: Angle(degrees: 270), endAngle: Angle(degrees: -90 + (1 - animatedBonusRemainingTime) * 360))
+                            .task {
+                                animatedBonusRemainingTime = card.bonusRemainingTimeRatio
+                                withAnimation(.linear(duration: card.bonusTime)) {
+                                    animatedBonusRemainingTime = 0
+                                }
+                            }
+                    }
+                    else {
+                        Pie(startAngle: Angle(degrees: 270), endAngle: Angle(degrees: -90 + (1 - card.bonusRemainingTimeRatio) * 360))
+                    }
+                }
+                .opacity(0.4)
             }
             .cardify(isFaceUp: card.isFaceUp)
-
         }
     }
     
@@ -132,7 +146,6 @@ struct CardView: View {
     }
     
 }
-
 
 struct ContentView_Preview: PreviewProvider {
     static var previews: some View {
